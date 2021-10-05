@@ -637,3 +637,5 @@
 /Users/antoine/Documents/Cours/NetCore/projet/testblazor/obj/Debug/net5.0/Razor/Pages/FormBeer.razor.g.cs
 /Users/antoine/Documents/Cours/NetCore/projet/testblazor/obj/Debug/net5.0/RazorDeclaration/Pages/Login.razor.g.cs
 /Users/antoine/Documents/Cours/NetCore/projet/testblazor/obj/Debug/net5.0/Razor/Pages/Login.razor.g.cs
+/Users/antoine/Documents/Cours/NetCore/projet/testblazor/obj/Debug/net5.0/RazorDeclaration/Shared/LoadingScreen.razor.g.cs
+/Users/antoine/Documents/Cours/NetCore/projet/testblazor/obj/Debug/net5.0/Razor/Shared/LoadingScreen.razor.g.cs
