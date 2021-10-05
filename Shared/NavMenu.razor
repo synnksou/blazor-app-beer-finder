@@ -1,0 +1,44 @@
+﻿<MudThemeProvider />
+
+<MudLayout>
+    <MudAppBar Style="@($"background-color:{Colors.Red.Accent2};")" Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"
+            OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <div style="color: white;">
+            <MudButton style="color: white;" Edge="Edge.End" Link="/login">Se connecter</MudButton>
+            <MudButton style="color: white;" Edge="Edge.End" Link="/signin">S'inscrire</MudButton>
+        </div>
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+        <MudDrawerHeader>
+            <MudDivider Class="my-2" />
+            <img src="assets/logo.png" asp-append-version="true" width="100px" style="margin: auto;" />
+
+
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/home">Accueil</MudNavLink>
+            <MudNavLink Href="/beer">Les bieres </MudNavLink>
+            <MudNavLink Href="/fetchdata">Recherche</MudNavLink>
+            <MudNavLink Href="/form-beer">Crée ta biere </MudNavLink>
+
+
+
+        </MudNavMenu>
+        @*NavMenu*@
+    </MudDrawer>
+    <MudMainContent>
+        @*Body*@
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
