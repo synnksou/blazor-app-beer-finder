@@ -10,7 +10,15 @@ namespace testblazor.Pages
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
+#nullable restore
+#line 1 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/_Imports.razor"
+using System.Net.Http;
+
+#line default
+#line hidden
+#nullable disable
 #nullable restore
 #line 2 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/_Imports.razor"
 using System.Net.Http.Json;
@@ -82,29 +90,29 @@ using MudBlazor;
 #line hidden
 #nullable disable
 #nullable restore
-#line 2 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/Pages/FormBeer.razor"
-using System.Text.RegularExpressions;
+#line 12 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/_Imports.razor"
+using Microsoft.AspNetCore.Components.Authorization;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 13 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/_Imports.razor"
+using Microsoft.AspNetCore.Authorization;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 3 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/Pages/FormBeer.razor"
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 4 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/Pages/FormBeer.razor"
-using System.Net.Http;
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 5 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/Pages/FormBeer.razor"
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 #line default
 #line hidden
@@ -118,33 +126,50 @@ using System.Threading.Tasks;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 45 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/Pages/FormBeer.razor"
+#line 43 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/Pages/FormBeer.razor"
        
+
     bool success;
     string[] errors = { };
     private bool autoClose;
     private bool readOnly;
+    public string NameFieldValue;
+    public string TaglineFieldValue;
 
-    
+    public string type;
 
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 51 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/Pages/FormBeer.razor"
-                            
+
+    private Beer beer;
 
     MudTextField<string> pwField1;
     MudForm form;
 
     MudDatePicker _picker;
     DateTime? date = DateTime.Today;
+    private string errorMessage;
 
-    
+    public async void postBeer()
+    {
+        beer = new Beer(NameFieldValue, TaglineFieldValue, "ipa", "descrpition", DateTime.Now, 8, "test");
+        using var response = await Http.PostAsJsonAsync("https://localhost:5002/api/beer", beer);
+        if (!response.IsSuccessStatusCode)
+        {
+            errorMessage = response.ReasonPhrase;
+            Console.WriteLine($"There was an error! {errorMessage}");
+            return;
+        }
+        else
+        {
+            errorMessage = "C DANS LA BDD WSHHHHH";
+        }
+        var toto = await response.Content.ReadFromJsonAsync<Beer>();
+
+    }
 
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private HttpClient Http { get; set; }
     }
 }
 #pragma warning restore 1591

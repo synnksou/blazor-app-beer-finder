@@ -1,0 +1,142 @@
+@page "/beer/{Id?}"
+@inject HttpClient Http
+@using System.Text.Json;
+@inject IHttpClientFactory ClientFactory
+
+
+<div style="max-width: 800px; margin: auto; padding-top: 150px">
+    <MudCard Elevation="2">
+        @if (success)
+        {
+            <MudAlert Severity="Severity.Success">@succesMessage</MudAlert>
+        }
+        @if (error)
+        {
+            <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+        }
+        <MudCardContent>
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField @bind-Value="NameFieldValue" T="string" Label="Nom de la Biere" Required="true"
+                    RequiredError="Il vous faut un nom a cette magnifique bière !" />
+                <MudTextField @bind-Value="TaglineFieldValue" T="string" Label="Marque" Required="true"
+                    RequiredError="Mais donnez lui une petite marque ! PS si vous avez pas d'idée vous pouvez ecrire Paix-dieu" />
+                <MudItem xs="12" sm="6" md="4">
+                    <MudDatePicker Label="Date brassé" @bind-Date="date" DisableToolbar="true" HelperText="No header" />
+                </MudItem>
+                <MudTextField @bind-Value="DescriptionFieldValue" T="string" Label="Description" />
+                <div class="d-flex">
+                    <MudRadioGroup @bind-Value="TypeFieldValue" T="string" Required="true"
+                        RequiredError="Type de Biere">
+                        <MudRadio @bind-Value="TypeFieldValue" Option="@("Ipa")">IPA</MudRadio>
+                        <MudRadio @bind-Value="TypeFieldValue" Option="@("Neipa")">New England IPA</MudRadio>
+                        <MudRadio @bind-Value="TypeFieldValue" Option="@("Triple")">Triple</MudRadio>
+                        <MudRadio Option="@("Blonde")">Blonde</MudRadio>
+                        <MudRadio Option="@("South")">South</MudRadio>
+                        <MudRadio Option="@("Brune")">Brune</MudRadio>
+                        <MudRadio Option="@("Blanche")">Blanche</MudRadio>
+                        <MudRadio Option="@("Rouge")">Rouge</MudRadio>
+                    </MudRadioGroup>
+                </div>
+            </MudForm>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="putBeer">Valider
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(()=>form.Reset())" Class="mx-2">Reset
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+
+
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    bool success;
+    bool error;
+    string[] errors = { };
+    private bool autoClose;
+    private bool readOnly;
+    public string NameFieldValue;
+    public string TaglineFieldValue;
+    public string TypeFieldValue;
+    public string DescriptionFieldValue;
+    private Beer beer;
+    MudForm form;
+    MudDatePicker _picker;
+    DateTime? date = DateTime.Today;
+    private string errorMessage;
+    private string succesMessage;
+
+    protected async Task putBeer()
+    {
+        var idInt = Convert.ToInt32(Id);
+        TypeFieldValue = "IPA";
+        beer = new Beer(idInt, NameFieldValue, TaglineFieldValue, TypeFieldValue, DescriptionFieldValue, DateTime.Now, 8,
+        "test");
+        using var response = await Http.PutAsJsonAsync("https://localhost:5002/api/beer", beer);
+        if (!response.IsSuccessStatusCode)
+        {
+            errorMessage = response.ReasonPhrase;
+            success = false;
+            error = true;
+            return;
+        }
+        else
+        {
+            error = false;
+            success = true;
+            succesMessage = "La Biere " + Id + " a bien été update";
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var url = "https://localhost:5002/api/beer/" + Id;
+
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            using var responseStream = await response.Content.ReadAsStreamAsync();
+            beer = await JsonSerializer.DeserializeAsync<Beer>(responseStream);
+        }
+        else
+        {
+            errorMessage = errorMessage = response.ReasonPhrase;
+        }
+
+    }
+
+    class Beer
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Tagline { get; set; }
+        public string Type { get; set; }
+        public string Description { get; set; }
+        public DateTime Date { get; set; }
+        public float Abv { get; set; }
+        public string Url { get; set; }
+
+        public Beer(int id, string name, string tagline, string type, string description, DateTime date, float abv, string url)
+        {
+            this.Name = name;
+            this.Tagline = tagline;
+            this.Type = type;
+            this.Description = description;
+            this.Date = date;
+            this.Abv = abv;
+            this.Url = url;
+            this.Id = id;
+        }
+
+    }
+
+}

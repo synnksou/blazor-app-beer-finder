@@ -1,4 +1,5 @@
 ﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication" Path="/Users/antoine/.nuget/packages/microsoft.aspnetcore.components.webassembly.authentication/5.0.10/build/../staticwebassets/" />
   <ContentRoot BasePath="_content/MudBlazor" Path="/Users/antoine/.nuget/packages/mudblazor/5.1.5/build/../staticwebassets/" />
   <ContentRoot BasePath="/" Path="/Users/antoine/Documents/Cours/NetCore/projet/testblazor/bin/Debug/net5.0/wwwroot/" />
   <ContentRoot BasePath="/" Path="/Users/antoine/Documents/Cours/NetCore/projet/testblazor/obj/Debug/net5.0/scopedcss/bundle/" />

@@ -15,23 +15,33 @@
         <MudDrawerHeader>
             <MudDivider Class="my-2" />
             <img src="assets/logo.png" asp-append-version="true" width="100px" style="margin: auto;" />
-
-
         </MudDrawerHeader>
         <MudNavMenu>
-            <MudNavLink Href="/home">Accueil</MudNavLink>
-            <MudNavLink Href="/beer">Les bieres </MudNavLink>
+            <MudNavLink style="display: flex;align-items: flex-start;" Href="/home">
+                <div style="display: flex;align-items: flex-start;">
+                    <MudIcon Icon="@Icons.Material.Filled.Home" Title="Home"
+                        Style="@($"color:{Colors.Red.Accent2};flex:1;")" />
+                    <div class="nav-link-text">Accueil</div>
+                </div>
+            </MudNavLink>
+            <MudNavGroup Title="Les Bières">
+                <MudNavLink Href="/beers/all">toutes les bières</MudNavLink>
+                <MudNavLink Href="/beers/ipa">IPA</MudNavLink>
+                <MudNavLink Href="/beers/blonde">Blonde</MudNavLink>
+                <MudNavLink Href="/beers/neipa">New England IPA</MudNavLink>
+                <MudNavLink Href="/beers/triple">Triple</MudNavLink>
+                <MudNavLink Href="/beers/blonde">Blonde</MudNavLink>
+                <MudNavLink Href="/beers/south">South</MudNavLink>
+            </MudNavGroup>
+
             <MudNavLink Href="/fetchdata">Recherche</MudNavLink>
             <MudNavLink Href="/form-beer">Crée ta biere !</MudNavLink>
-
-
-
         </MudNavMenu>
         @*NavMenu*@
     </MudDrawer>
-    <MudMainContent>
+    <udMainContent>
         @*Body*@
-    </MudMainContent>
+    </udMainContent>
 </MudLayout>
 
 @code {

@@ -1,16 +1,15 @@
 @page "/form-beer"
-@using System.Text.RegularExpressions
-@using System.ComponentModel.DataAnnotations
-@using System.Net.Http;
-@using System.Threading.Tasks;
-
-<div style="max-width: 800px; margin: auto;">
+@inject HttpClient Http
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+<div style="max-width: 800px; margin: auto; padding-top: 150px">
     <MudCard Elevation="2">
+        @errorMessage
         <MudCardContent>
             <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudTextField T="string" Label="Nom de la Biere" Required="true"
+                <MudTextField @bind-Value="NameFieldValue" T="string" Label="Nom de la Biere" Required="true"
                     RequiredError="Il vous faut un nom a cette magnifique bière !" />
-                <MudTextField T="string" Label="Marque" Required="true"
+                <MudTextField @bind-Value="TaglineFieldValue" T="string" Label="Marque" Required="true"
                     RequiredError="Mais donnez lui une petite marque ! PS si vous avez pas d'idée vous pouvez ecrire Paix-dieu" />
                 <MudItem xs="12" sm="6" md="4">
                     <MudDatePicker Label="Date brassé" @bind-Date="date" DisableToolbar="true" HelperText="No header" />
@@ -31,11 +30,10 @@
             </MudForm>
         </MudCardContent>
         <MudCardActions>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(()=>form.Validate())">Validate
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="postBeer">Valider
             </MudButton>
             <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(()=>form.Reset())" Class="mx-2">Reset
             </MudButton>
-            <MudButton Variant="Variant.Filled" OnClick="@(()=>form.ResetValidation())">Reset Validation</MudButton>
         </MudCardActions>
     </MudCard>
 
@@ -43,26 +41,41 @@
 </div>
 
 @code {
+
     bool success;
     string[] errors = { };
     private bool autoClose;
     private bool readOnly;
+    public string NameFieldValue;
+    public string TaglineFieldValue;
 
-    @* private Beer beer; *@
+    public string type;
+
+
+    private Beer beer;
 
     MudTextField<string> pwField1;
     MudForm form;
 
     MudDatePicker _picker;
     DateTime? date = DateTime.Today;
+    private string errorMessage;
 
-    @* protected override async Task OnInitializedAsync()
+    public async void postBeer()
+    {
+        beer = new Beer(NameFieldValue, TaglineFieldValue, "ipa", "descrpition", DateTime.Now, 8, "test");
+        using var response = await Http.PostAsJsonAsync("https://localhost:5002/api/beer", beer);
+        if (!response.IsSuccessStatusCode)
         {
-        var postBody = new { Title = "Blazor POST Request Example" };
-        using var response = await HttpClient.PostAsJsonAsync("https://reqres.in/api/articles", postBody);
-
-        // convert response data to Article object
-        beer = await response.Content.ReadFromJsonAsync<Beer>();
+            errorMessage = response.ReasonPhrase;
+            Console.WriteLine($"There was an error! {errorMessage}");
+            return;
         }
-    *@
+        else
+        {
+            errorMessage = "C DANS LA BDD WSHHHHH";
+        }
+        var toto = await response.Content.ReadFromJsonAsync<Beer>();
+
+    }
 }

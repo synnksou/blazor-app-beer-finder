@@ -1,5 +1,18 @@
 @import url("open-iconic/font/css/open-iconic-bootstrap.min.css");
 
+.nav-link-text {
+  flex: 2;
+}
+.nav-link-text::selection {
+  background-color: cyan;
+  color: #ff5252;
+}
+.nav-link-text::placeholder {
+  color: #ff5252;
+}
+.color-button-red {
+  color: #ff5252;
+}
 .bodybox {
   min-height: 100vh;
   font-family: Roboto, Arial;

@@ -89,6 +89,20 @@ using MudBlazor;
 #line default
 #line hidden
 #nullable disable
+#nullable restore
+#line 12 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/_Imports.razor"
+using Microsoft.AspNetCore.Components.Authorization;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 13 "/Users/antoine/Documents/Cours/NetCore/projet/testblazor/_Imports.razor"
+using Microsoft.AspNetCore.Authorization;
+
+#line default
+#line hidden
+#nullable disable
     public partial class LoadingScreen : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
@@ -106,7 +120,7 @@ using MudBlazor;
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(2000); // TODO actual initialization job
+        await Task.Delay(1500);
         isLoaded = true;
     }
 

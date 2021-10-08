@@ -1,0 +1,104 @@
+@page "/beers/{type?}"
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@inject IHttpClientFactory ClientFactory
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+
+<MudContainer style="padding-top: 150px" MaxWidth="MaxWidth.Large">
+    <div style="padding: 8 px; display:flex;height: 500px;flex-direction: column;flex-wrap: wrap;">
+        @foreach (var item in beers)
+        {
+            <div style="flex: 1 1 auto; padding: 1.5rem">
+                <MudCard style="max-width: 450px; width : 100%">
+                    <MudCardMedia Image="@item.url" Height="200" />
+                    <MudCardContent>
+                        <MudText Typo="Typo.h5">@item.name</MudText>
+                        <MudText Typo="Typo.body2">@item.tagline</MudText>
+                        <MudText Typo="Typo.body2">@item.type</MudText>
+                        <MudRating SelectedValue="4" FullIcon="@Icons.Material.Filled.Favorite"
+                        EmptyIcon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Secondary" />
+
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Error"
+                        OnClick="() => NavigateToBeer(item.id)">
+                            Detail</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Error"
+                        OnClick="@(async () => await Delete(item.id))">
+                            Supprimer</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </div>
+        }
+    </div>
+</MudContainer>
+
+
+@code {
+    public class Beers
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string tagline { get; set; }
+        public string type { get; set; }
+        public string description { get; set; }
+        public DateTime date { get; set; }
+        public int abv { get; set; }
+        public string url { get; set; }
+
+
+    }
+
+    [Parameter]
+    public string Type { get; set; }
+    private List<Beers> beers = new List<Beers>();
+    private bool getError;
+    private bool shouldRender;
+
+
+    protected override bool ShouldRender() => shouldRender;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var url = "";
+        if (Type != "all")
+        {
+            url = "https://localhost:5002/api/beer/search?type=" + Type;
+        }
+        else
+        {
+            url = "https://localhost:5002/api/beer";
+        }
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            using var responseStream = await response.Content.ReadAsStreamAsync();
+            beers = await JsonSerializer.DeserializeAsync<List<Beers>>(responseStream);
+        }
+        else
+        {
+            getError = true;
+        }
+
+        shouldRender = true;
+    }
+
+    protected async Task Delete(int id)
+    {
+        await httpClient.DeleteAsync("https://localhost:5002/api/beer/" + id);
+        beers.RemoveAll(beer => beer.id == id);
+        NavigationManager.NavigateTo("/beers");
+    }
+
+
+    protected void NavigateToBeer(int id){
+        NavigationManager.NavigateTo("/beer/"+id);
+    }
+}

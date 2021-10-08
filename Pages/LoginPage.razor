@@ -1,0 +1,97 @@
+@page "/login"
+@inject HttpClient Http
+@* @inject ProtectedLocalStorage BrowserStorage *@
+
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudText style="padding-top:150px" Align="Align.Center" Typo="Typo.h2">Connectez vous pour plus de simplicité
+    </MudText>
+    <div style="margin:30px">
+        <hr>
+    </div>
+
+    <div style="margin: auto;display: flex; align-items: center; padding-left:1rem">
+        <img src="assets/undraw_auth.svg" style="width: 350px; flex : 1" />
+
+
+        <div style="max-width: 500px; flex:1; max-height:2OOpx;">
+            <MudCard Elevation="2">
+                @errorMessage
+                <MudCardContent>
+                    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                        <MudTextField T="string" @bind-Value="email" Label="Email" Required="true"
+                            RequiredError="Email requis !" />
+                        <MudTextField @bind-Value="password" T="string" Label="Mot de Passe" @ref="pwField1"
+                            InputType="InputType.Password"
+                            Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                            RequiredError="Password is required!" />
+                        <MudLink class="color-button-red" Href="#" Typo="Typo.overline">Mot de passe oublié ?</MudLink>
+                    </MudForm>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton OnClick="LogUsername" Variant="Variant.Filled" Disabled="@(!success)"
+                        Class="ml-auto color-button-red">
+                        Se Connecter
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+            <MudText Typo="Typo.overline">Vous n'avez pas encore de compte ?</MudText>
+            <MudLink class="color-button-red" Href="/signin" Style="@($"color:{Colors.Red.Accent2};")"
+                Typo="Typo.overline">C'est ici que ça ce passe !</MudLink>
+
+        </div>
+
+    </div>
+
+</MudContainer>
+
+
+
+
+@code {
+
+    public string email;
+    public string password;
+
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+    private string errorMessage;
+    public Login login;
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Votre mot de passe est requis !";
+            yield break;
+        }
+    }
+
+    protected async Task LogUsername()
+    {
+        login = new Login("test", "test");
+        Console.WriteLine("toto");
+        using var response = await Http.PostAsJsonAsync("https://localhost:5002/api/Token/login", login);
+        if (!response.IsSuccessStatusCode)
+        {
+            errorMessage = response.ReasonPhrase;
+            return;
+        }
+        else
+        {
+            errorMessage = "Vous etes bien connecter !";
+            var token = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(token);
+           @*  Save(token); *@
+        }
+
+    }
+
+    @* public async Task Save(string token)
+    {
+        await BrowserStorage.SetAsync("name", token);
+    } *@
+
+}

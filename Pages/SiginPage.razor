@@ -1,0 +1,109 @@
+@page "/signin"
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudText style="margin:30px" Align="Align.Center" Typo="Typo.h2">Connectez vous pour plus de simplicité</MudText>
+    <div style="margin:30px">
+        <hr>
+    </div>
+
+    <div style="margin: auto;display: flex; align-items: center; padding-left:1rem">
+        <img src="assets/undraw_auth.svg" style="width: 350px; flex : 1" />
+
+
+        <div style="max-width: 500px; flex:1; max-height:2OOpx;">
+            <MudCard>
+                <MudCardContent>
+                    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                        <MudTextField  @bind-Value="NameFieldValue" T="string" Label="Prenom" Required="true" @ref="NameField"
+                            RequiredError="Votre prenom est requis!" />
+                        <MudTextField T="string" Label="Nom" Required="true" RequiredError="Votre nom est requis !"
+                            @ref="pwField1" />
+                        <MudTextField @bind-Value="EmailFieldValue" T="string" Label="Email" Required="true"
+                            RequiredError="Votre eamil est requis !" @ref="EmailField"
+                            Validation="@(new EmailAddressAttribute() {ErrorMessage = "Cette adresse email est invalid"})" />
+                        <MudTextField @bind-Value="PasswordFieldValue"  T="string" Label="Mot de passe" HelperText="" @ref="pwField1"
+                            InputType="InputType.Password"
+                            Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                            RequiredError="Password is required!" />
+                        <MudTextField T="string" Label="Mot de passe" HelperText="Répéter le mot de passe"
+                            InputType="InputType.Password" Validation="@(new Func<string, string>(PasswordMatch))" />
+                        <MudCheckBox T="bool" Required="true" RequiredError="Vous devez accept" Class="ml-n2"
+                            Label="J'acceptes les conditions générales d'utilisations." />
+                    </MudForm>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton OnClick="signInApi" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)"
+                        Class="ml-auto">
+                        S'inscrire
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+            <MudText Typo="Typo.overline">Vous avez deja un compte ?</MudText>
+            <MudLink class="color-button-red" Href="/login" Style="@($"color:{Colors.Red.Accent2};")"
+                Typo="Typo.overline">C'est ici que ça ce passe !</MudLink>
+
+        </div>
+
+    </div>
+
+</MudContainer>
+
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudTextField<string> EmailField;
+    MudTextField<string> pwField1;
+    MudTextField<string> NameField;
+    MudForm form;
+    string EmailFieldValue;
+    string NameFieldValue;
+    string PasswordFieldValue;
+    private string errorMessage;
+
+    public Utilisateur user;
+ 
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Les mot de passes de ne ressemble pas.";
+        return null;
+    }
+
+    protected async Task signInApi()
+    {
+
+        user = new Utilisateur(NameFieldValue,EmailFieldValue,PasswordFieldValue);
+        using var response = await Http.PostAsJsonAsync("https://localhost:5002/api/Utilisateur", user);
+        if (!response.IsSuccessStatusCode)
+        {
+            errorMessage = response.ReasonPhrase;
+            Console.WriteLine($"There was an error! {errorMessage}");
+            return;
+        }else{
+             errorMessage = "Vous etes bien inscrit !";
+        }
+        var toto = await response.Content.ReadFromJsonAsync<Utilisateur>();
+
+    }
+}
